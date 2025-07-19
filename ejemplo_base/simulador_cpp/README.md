@@ -1,149 +1,98 @@
-# 🛰️ Simulador C++ para Sensores Urbanos — UrbIA · Fase 0
+# 🧪 Módulo `simulador_cpp` – UrbIA
 
-Este módulo simula múltiples sensores ambientales en C++ y envía lecturas en tiempo real a un servidor ThingsBoard usando su API HTTP.
+Este módulo forma parte del proyecto **UrbIA** y tiene como objetivo simular el comportamiento de múltiples sensores ambientales y enviar su telemetría a ThingsBoard mediante peticiones HTTP en formato JSON.
 
----
+## 📦 Estructura del proyecto
 
-## 📚 Descripción
+```
 
-El propósito es replicar un entorno urbano sensorizado con datos artificiales para pruebas de dashboards y plataformas de visualización en **UrbIA**.
+simulador\_cpp/
+├── include/             # Archivos de encabezado (.hpp)
+├── src/                 # Implementación de clases (.cpp)
+├── build/               # Archivos objeto compilados (.o)
+├── sensor\_simulator     # Binario resultante tras compilación
+├── .env                 # Archivo con token de autenticación
+├── Makefile             # Archivo para construir el ejecutable
+└── README.md            # Documentación del módulo
 
-Cada sensor es una clase que hereda de `SensorBase`. Se generan valores aleatorios dentro de rangos realistas y se envían cada 5 segundos.
-
----
-
-## 🌐 Requisitos
-
-- C++17 (`g++`)
-- `libcurl` instalado (`sudo apt install libcurl4-openssl-dev`)
-- Sistema Linux/Unix
-- Servidor ThingsBoard local o remoto corriendo en `http://localhost:8080`
-- 📦 **Librería `nlohmann/json.hpp` (no incluida en el repositorio)**
-
----
-
-## ⚠️ Dependencia Externa: `nlohmann/json.hpp`
-
-Este archivo no se incluye en el repositorio (está en `.gitignore`).  
-Antes de compilar, debes instalarlo manualmente así:
-
-```bash
-# Crear la carpeta si no existe
-mkdir -p include/nlohmann
-
-# Descargar el archivo desde el repositorio oficial
-curl -o include/nlohmann/json.hpp https://raw.githubusercontent.com/nlohmann/json/develop/single_include/nlohmann/json.hpp
 ````
 
----
+## 🌡️ Sensores simulados
 
-## 📁 Estructura del Proyecto
+El simulador genera lecturas de los siguientes sensores:
 
-```
-simulador_cpp/
-├── include/         # Headers de sensores, cliente HTTP, logger, loader .env
-│   ├── Sensor*.hpp
-│   ├── HttpClient.hpp
-│   ├── EnvLoader.hpp
-│   ├── Logger.hpp
-│   └── nlohmann/     # <--- DEBES CREAR ESTA CARPETA Y AÑADIR json.hpp
-│       └── json.hpp
-├── src/             # Implementaciones
-│   ├── Sensor*.cpp
-│   ├── HttpClient.cpp
-│   ├── EnvLoader.cpp
-│   └── Logger.cpp
-├── logs/            # Log del simulador
-│   └── simulador.log
-├── build/           # Objetos compilados
-├── sensor_simulator # Ejecutable
-├── Makefile         # Script de compilación
-└── .env             # Token del dispositivo
-```
+- `co2` (ppm)
+- `temperatura` (°C)
+- `humedad` (%)
+- `presion` (hPa)
+- `luz` (lux)
+- `ruido` (dB)
 
----
+Cada sensor tiene un rango de valores realistas y puede generar valores fuera de rango para simular fallos o eventos anómalos.
 
-## 📦 Sensores Simulados
+## 🔐 Configuración del token
 
-| Sensor      | Rango          | Unidad |
-| ----------- | -------------- | ------ |
-| CO₂         | 400 – 600      | ppm    |
-| Temperatura | 20.0 – 35.0    | °C     |
-| Humedad     | 40.0 – 80.0    | %      |
-| Presión     | 990.0 – 1025.0 | hPa    |
-| Luz         | 0 – 1000       | Lux    |
-| Ruido       | 30.0 – 120.0   | dB     |
-
----
-
-## 🛠️ Configuración
-
-### 1. Crear `.env`
-
-En la raíz del módulo (`simulador_cpp/`):
+El archivo `.env` debe contener el token de autenticación del dispositivo ThingsBoard:
 
 ```env
-THINGSBOARD_TOKEN=<<TU_TOKEN_AQUI>>
-```
+THINGSBOARD_TOKEN=tu_token_aqui
+````
 
-Este token debe corresponder al dispositivo registrado en ThingsBoard.
+> Este token se obtiene desde ThingsBoard al crear un nuevo dispositivo.
 
----
+## ⚙️ Compilación
 
-## 🚀 Compilar y Ejecutar
-
-```bash
-make clean && make run
-```
-
-Esto:
-
-* Compila todo el código fuente
-* Genera el binario `sensor_simulator`
-* Inicia el envío de datos
-
----
-
-## 🧾 Ejemplo de Payload JSON
-
-```json
-{
-  "co2": 477.0,
-  "temperatura": 34.33,
-  "humedad": 65.97,
-  "presion": 995.53,
-  "luz": 675.29,
-  "ruido": 50.27
-}
-```
-
-Se envía vía `POST` a:
-
-```
-http://localhost:8080/api/v1/<TOKEN>/telemetry
-```
-
----
-
-## 🧩 Componentes Internos
-
-* `SensorBase.hpp`: Clase abstracta base
-* `Sensor*.hpp/cpp`: Implementaciones individuales
-* `HttpClient`: Usa libcurl para enviar los datos
-* `EnvLoader`: Carga variables de entorno desde `.env`
-* `Logger`: Registra todos los eventos en `logs/simulador.log`
-
----
-
-## 📈 Output
+Para compilar el simulador, asegúrate de tener instalado `g++` y `libcurl`. Luego, ejecuta:
 
 ```bash
-📡 Sensor: co2, Valor: 477.000000
-📡 Sensor: temperatura, Valor: 34.330000
-...
-✅ Datos enviados correctamente.
+make clean
+make
 ```
 
+Esto generará el ejecutable `sensor_simulator`.
+
+## 🚀 Ejecución
+
+Para ejecutar el simulador y enviar lecturas periódicas al servidor ThingsBoard:
+
+```bash
+./sensor_simulator
 ```
 
----
+El simulador leerá el token desde el archivo `.env` y enviará los datos al endpoint:
+
+```
+https://inti-data.ngrok.io/telemetry/{TOKEN}
+```
+
+## 📡 Ejemplo de salida
+
+```bash
+📡 Sensor: co2, Valor: 450.34
+📡 Sensor: temperatura, Valor: 32.27
+📡 Sensor: humedad, Valor: 72.57
+📡 Sensor: presion, Valor: 993.66
+📡 Sensor: luz, Valor: 202.45
+📡 Sensor: ruido, Valor: 64.40
+✅ Datos enviados correctamente. Código de respuesta: 200
+```
+
+Los valores fuera de rango son detectados y marcados con un ❌.
+
+## ✅ Integración con ThingsBoard
+
+Una vez enviados los datos, pueden visualizarse desde la pestaña **Última telemetría** del dispositivo en ThingsBoard:
+
+![Datos en ThingsBoard](./assets/thingsboard_telemetria.png)
+
+> Puedes personalizar paneles o reglas en ThingsBoard a partir de estos datos.
+
+## 🛠️ Dependencias
+
+* C++17
+* libcurl
+* Make
+
+## 🧠 Créditos
+
+Desarrollado como parte del proyecto doctoral **UrbIA** para simulación de IoT urbano inteligente con integración SDN y Edge Computing.

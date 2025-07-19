@@ -3,7 +3,11 @@
 #include <iostream>
 
 HttpClient::HttpClient(const std::string& token)
-    : token(token), url("https://inti-data.ngrok.io/api/v1/" + token + "/telemetry") {}
+	// : token(token), url("https://inti-data.ngrok.io/api/v1/" + token + "/telemetry") {}
+	// : token(token), url("http://inti-data.ngrok.io/telemetria") {}
+	// : token(token), url("https://inti-data.ngrok.io/telemetry/" + token) {}
+	: token(token), url("https://inti-data.ngrok.io/api/v1/" + token + "/telemetry") {}
+
 
 
 
