@@ -56,7 +56,7 @@ node\_edge/
 ### `db.py`
 
 ```python
-DATABASE_URL = "postgresql://postgres:Alejito10.@localhost/urbia"
+DATABASE_URL = "postgresql://postgres:<Password>@localhost/urbia"
 ````
 
 > Cambiar si la base de datos se aloja fuera del contenedor o si el usuario cambia.
