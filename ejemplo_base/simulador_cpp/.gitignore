@@ -1,0 +1,9 @@
+.env
+
+# Ignorar binarios y temporales
+sensor_simulator
+build/
+*.log
+
+# Ignorar librería externa JSON
+include/nlohmann/
